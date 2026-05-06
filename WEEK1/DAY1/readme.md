@@ -64,7 +64,7 @@
 Day1/
 │
 ├── README.md
-├── sql_practice_queries.md
+├── Queries.sql
 └── output.md
 ```
 
