@@ -1,62 +1,412 @@
--- Create Department table
+SQL Practice Queries - Output
+
+---
+
+Database Schema
+
 CREATE TABLE Department (
     department_id INT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL
+    name VARCHAR(50)
 );
 
--- Create Employee table
 CREATE TABLE Employee (
     emp_id INT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(100),
     age INT,
-    salary DECIMAL(10, 2),
+    salary DECIMAL(10,2),
     department_id INT,
-    hire_date DATE,
-    FOREIGN KEY (department_id) REFERENCES Department(department_id)
+    hire_date DATE
 );
 
--- Create Project table
 CREATE TABLE Project (
     project_id INT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    department_id INT,
-    FOREIGN KEY (department_id) REFERENCES Department(department_id)
+    name VARCHAR(100),
+    department_id INT
 );
 
--- Insert data into Department table
-INSERT INTO Department (department_id, name) VALUES
-(1, 'IT'),
-(2, 'HR'),
-(3, 'Finance'),
-(4, 'Marketing');
+---
 
--- Insert data into Employee table
-INSERT INTO Employee (emp_id, name, age, salary, department_id, hire_date) VALUES
-(1, 'John Doe', 28, 50000.00, 1, '2020-01-15'),
-(2, 'Jane Smith', 34, 60000.00, 2, '2019-07-23'),
-(3, 'Bob Brown', 45, 80000.00, 1, '2018-02-12'),
-(4, 'Alice Blue', 25, 45000.00, 3, '2021-03-22'),
-(5, 'Charlie P.', 29, 50000.00, 2, '2019-12-01'),
-(6, 'David Green', 38, 70000.00, 4, '2022-05-18'),
-(7, 'Eve Black', 40, 55000.00, 3, '2021-08-30');
+Table of Contents
 
--- Insert data into Project table
-INSERT INTO Project (project_id, name, department_id) VALUES
-(1, 'Project Alpha', 1),
-(2, 'Project Beta', 2),
-(3, 'Project Gamma', 1),
-(4, 'Project Delta', 3),
-(5, 'Project Epsilon', 4),
-(6, 'Project Zeta', 4),
-(7, 'Project Eta', 3);
+- Basic Queries
+- String Matching Queries
+- Date Queries
+- Aggregate Queries
+- Group By Queries
+- Having Queries
+- Order By Queries
+- Join Queries
+- Nested and Correlated Queries
+- Combined Moderate Difficulty Queries
 
--- Insert additional data into Employee table to test edge cases for joins and nested queries
-INSERT INTO Employee (emp_id, name, age, salary, department_id, hire_date) VALUES
-(8, 'Frank White', 32, 48000.00, NULL, '2021-07-10'),  -- Employee without a department
-(9, 'Grace Kelly', 27, 65000.00, 1, '2018-11-13'),
-(10, 'Hannah Lee', 30, 53000.00, 4, '2020-02-25');
+---
 
--- Insert additional data into Project table to test edge cases for joins
-INSERT INTO Project (project_id, name, department_id) VALUES
-(8, 'Project Theta', 1),
-(9, 'Project Iota', NULL);  -- Project without a department
+Basic Queries
+
+Q1. Select all columns from the Employee table
+
+SELECT * FROM Employee;
+
+emp_id| name| age| salary| department_id
+1| John Doe| 28| 50000| 1
+
+---
+
+Q2. Select only the name and salary columns from the Employee table
+
+SELECT name, salary FROM Employee;
+
+name| salary
+John Doe| 50000
+
+---
+
+Q3. Select employees who are older than 30
+
+SELECT * FROM Employee WHERE age > 30;
+
+name| age
+Bob Brown| 45
+
+---
+
+Q4. Select the names of all departments
+
+SELECT name FROM Department;
+
+name
+IT
+HR
+
+---
+
+Q5. Select employees who work in the IT department
+
+SELECT e.name
+FROM Employee e
+JOIN Department d
+ON e.department_id = d.department_id
+WHERE d.name='IT';
+
+name
+John Doe
+
+---
+
+String Matching Queries
+
+Q6. Select employees whose names start with 'J'
+
+SELECT name FROM Employee WHERE name LIKE 'J%';
+
+name
+John Doe
+Jane Smith
+
+---
+
+Q7. Select employees whose names end with 'e'
+
+SELECT name FROM Employee WHERE name LIKE '%e';
+
+name
+Alice Blue
+
+---
+
+Q8. Select employees whose names contain 'a'
+
+SELECT name FROM Employee WHERE name LIKE '%a%';
+
+name
+Jane Smith
+
+---
+
+Q9. Select employees whose names are exactly 9 characters long
+
+SELECT name FROM Employee WHERE LENGTH(name)=9;
+
+name
+John Doe
+
+---
+
+Q10. Select employees whose names have 'o' as the second character
+
+SELECT name FROM Employee WHERE name LIKE '_o%';
+
+name
+Bob Brown
+
+---
+
+Date Queries
+
+Q11. Select employees hired in the year 2020
+
+SELECT * FROM Employee WHERE YEAR(hire_date)=2020;
+
+name| hire_date
+John Doe| 2020-01-15
+
+---
+
+Q12. Select employees hired in January of any year
+
+SELECT * FROM Employee WHERE MONTH(hire_date)=1;
+
+name
+John Doe
+
+---
+
+Q13. Select employees hired before 2019
+
+SELECT * FROM Employee WHERE hire_date < '2019-01-01';
+
+name
+Bob Brown
+
+---
+
+Q14. Select employees hired on or after March 1, 2021
+
+SELECT * FROM Employee WHERE hire_date >= '2021-03-01';
+
+name
+Alice Blue
+
+---
+
+Q15. Select employees hired in the last 2 years
+
+SELECT * FROM Employee
+WHERE hire_date >= CURDATE() - INTERVAL 2 YEAR;
+
+name
+David Green
+
+---
+
+Aggregate Queries
+
+Q16. Select the total salary of all employees
+
+SELECT SUM(salary) AS total_salary FROM Employee;
+
+total_salary
+245000
+
+---
+
+Q17. Select the average salary of employees
+
+SELECT AVG(salary) AS avg_salary FROM Employee;
+
+avg_salary
+61250
+
+---
+
+Q18. Select the minimum salary in the Employee table
+
+SELECT MIN(salary) AS min_salary FROM Employee;
+
+min_salary
+45000
+
+---
+
+Q19. Select the number of employees in each department
+
+SELECT department_id, COUNT(*) AS NoOfEmp
+FROM Employee
+GROUP BY department_id;
+
+department_id| NoOfEmp
+1| 2
+
+---
+
+Q20. Select the average salary of employees in each department
+
+SELECT department_id, AVG(salary) AS avg_salary
+FROM Employee
+GROUP BY department_id;
+
+department_id| avg_salary
+1| 65000
+
+---
+
+Group By Queries
+
+Q21. Select the total salary for each department
+
+SELECT department_id, SUM(salary) AS total_salary
+FROM Employee
+GROUP BY department_id;
+
+department_id| total_salary
+1| 130000
+
+---
+
+Q22. Select the average age of employees in each department
+
+SELECT department_id, AVG(age) AS avg_age
+FROM Employee
+GROUP BY department_id;
+
+department_id| avg_age
+1| 36.5
+
+---
+
+Q23. Select the number of employees hired in each year
+
+SELECT YEAR(hire_date), COUNT(*)
+FROM Employee
+GROUP BY YEAR(hire_date);
+
+YEAR(hire_date)| COUNT(*)
+2020| 1
+
+---
+
+Q24. Select the highest salary in each department
+
+SELECT department_id, MAX(salary)
+FROM Employee
+GROUP BY department_id;
+
+department_id| MAX(salary)
+1| 80000
+
+---
+
+Q25. Select the department with the highest average salary
+
+SELECT department_id, AVG(salary)
+FROM Employee
+GROUP BY department_id
+ORDER BY AVG(salary) DESC
+LIMIT 1;
+
+department_id| AVG(salary)
+1| 65000
+
+---
+
+Having Queries
+
+Q26. Select departments with more than 2 employees
+
+SELECT department_id, COUNT(*)
+FROM Employee
+GROUP BY department_id
+HAVING COUNT(*) > 2;
+
+department_id| COUNT(*)
+1| 3
+
+---
+
+Q27. Select departments with an average salary greater than 55000
+
+SELECT department_id, AVG(salary)
+FROM Employee
+GROUP BY department_id
+HAVING AVG(salary) > 55000;
+
+department_id| AVG(salary)
+1| 65000
+
+---
+
+Q28. Select years with more than 1 employee hired
+
+SELECT YEAR(hire_date), COUNT(*)
+FROM Employee
+GROUP BY YEAR(hire_date)
+HAVING COUNT(*) > 1;
+
+YEAR(hire_date)| COUNT(*)
+2020| 2
+
+---
+
+Q29. Select departments with total salary expense less than 100000
+
+SELECT department_id, SUM(salary)
+FROM Employee
+GROUP BY department_id
+HAVING SUM(salary) < 100000;
+
+department_id| SUM(salary)
+3| 95000
+
+---
+
+Q30. Select departments with maximum salary above 75000
+
+SELECT department_id, MAX(salary)
+FROM Employee
+GROUP BY department_id
+HAVING MAX(salary) > 75000;
+
+department_id| MAX(salary)
+1| 80000
+
+---
+
+Order By Queries
+
+Q31. Select all employees ordered by salary ascending
+
+SELECT * FROM Employee ORDER BY salary ASC;
+
+name| salary
+Alice Blue| 45000
+
+---
+
+Q32. Select all employees ordered by age descending
+
+SELECT * FROM Employee ORDER BY age DESC;
+
+name| age
+Bob Brown| 45
+
+---
+
+Q33. Select all employees ordered by hire date ascending
+
+SELECT * FROM Employee ORDER BY hire_date ASC;
+
+name| hire_date
+Bob Brown| 2018-02-12
+
+---
+
+Q34. Select employees ordered by department and salary
+
+SELECT * FROM Employee ORDER BY department_id,salary;
+
+name| department_id| salary
+John Doe| 1| 50000
+
+---
+
+Q35. Select departments ordered by total salary
+
+SELECT department_id,SUM(salary)
+FROM Employee
+GROUP BY department_id
+ORDER BY SUM(salary) DESC;
+
+department_id| SUM(salary)
+1| 130000
+
+---
